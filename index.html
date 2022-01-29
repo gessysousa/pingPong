@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PingPong</title>
 </head>
-  <body onload="changeScreenSize()">
+  <body>
     <canvas width="600" height="400"></canvas>
     <iframe src=”https://olafwempe.com/mp3/silence/silence.mp3″ type=”audio/mp3″ allow=”autoplay” id=”audio” style= "display:none;"></iframe>
     <audio id="trilha" autoplay loop >
@@ -18,8 +18,7 @@
     <audio id="ponto">
       <source src="ponto.mp3">
     </audio>
-  </body>
-</html>
+  
 
 
 
@@ -46,6 +45,7 @@
   let larguraRaquete = 10;
   let alturaRaquete = 90;
   let velocidadeYOponente;
+  let chanceDeErrar = 0;
 
   //placar do jogo
   let meusPontos = 0;
@@ -157,8 +157,9 @@
   }
 
   function movimentaRaqueteOponente() {
-    velocidadeYOponente = y - yRaqueteOponente - larguraRaquete / 2 - 100; //-50 é a margem de erro pra que possamos fazer pontos
-    yRaqueteOponente += velocidadeYOponente;
+    velocidadeYOponente = y - yRaqueteOponente - larguraRaquete / 2 - 30; //-50 é a margem de erro pra que possamos fazer pontos
+    yRaqueteOponente += velocidadeYOponente + chanceDeErrar;
+    calculaChanceDeErrar();
     if (yRaqueteOponente <= 0) {
       yRaqueteOponente = 0;
     }
@@ -202,8 +203,21 @@
     ponto.play();
   }
 
-  function changeScreenSize() {        
-        window.resizeTo(screen.width-300,screen.height-500)   
+    function calculaChanceDeErrar() {
+  if (pontosOponente >= meusPontos) {
+    chanceDeErrar += 1
+    if (chanceDeErrar >= 39){
+    chanceDeErrar = 40
     }
+  } else {
+    chanceDeErrar -= 1
+    if (chanceDeErrar <= 35){
+    chanceDeErrar = 35
+    }
+  }
+}
   setInterval(draw, 20);
 </script>
+
+</body>
+</html>
