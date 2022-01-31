@@ -1,223 +1,232 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PingPong</title>
 </head>
-  <body>
-    <canvas width="600" height="400"></canvas>
-    <iframe src=”https://olafwempe.com/mp3/silence/silence.mp3″ type=”audio/mp3″ allow=”autoplay” id=”audio” style= "display:none;"></iframe>
-    <audio id="trilha" autoplay loop >
-      <source src="trilha.mp3">
-    </audio>
-    <audio id="raquetada">
-      <source src="raquetada.mp3">
-    </audio>
-    <audio id="ponto">
-      <source src="ponto.mp3">
-    </audio>
-  
+
+<body>
+  <canvas width="600" height="400"></canvas>
+  <iframe src=”https://olafwempe.com/mp3/silence/silence.mp3″ type=”audio/mp3″ allow=”autoplay” id=”audio”
+    style="display:none;"></iframe>
+  <audio id="trilha" autoplay loop>
+    <source src="trilha.mp3">
+  </audio>
+  <audio id="raquetada">
+    <source src="raquetada.mp3">
+  </audio>
+  <audio id="ponto">
+    <source src="ponto.mp3">
+  </audio>
 
 
 
-<script>
-  //variaveis referentes ao canvas
-  let tela = document.querySelector("canvas");
-  let pincel = tela.getContext("2d");
 
-  //variaveis da bolinha
-  let x = 300;
-  let y = 200;
-  let raio = 10;
-  let cor = "white";
+  <script>
+    //variaveis referentes ao canvas
+    let tela = document.querySelector("canvas");
+    let pincel = tela.getContext("2d");
 
-  //variaveis da velocidade da bolinha
-  let velocidadeX = 6;
-  let velocidadeY = 6;
+    //variaveis da bolinha
+    let x = 300;
+    let y = 200;
+    let raio = 10;
+    let cor = "white";
 
-  //variáveis das raquetes
-  let xRaquete = 5;
-  let xRaqueteOponente = 585;
-  let yRaquete = 150;
-  let yRaqueteOponente = 150;
-  let larguraRaquete = 10;
-  let alturaRaquete = 90;
-  let velocidadeYOponente;
-  let chanceDeErrar = 0;
+    //variaveis da velocidade da bolinha
+    let velocidadeX = 6;
+    let velocidadeY = 6;
 
-  //placar do jogo
-  let meusPontos = 0;
-  let pontosOponente = 0;
+    //variáveis das raquetes
+    let xRaquete = 5;
+    let xRaqueteOponente = 585;
+    let yRaquete = 150;
+    let yRaqueteOponente = 150;
+    let larguraRaquete = 10;
+    let alturaRaquete = 90;
+    let velocidadeYOponente;
+    let chanceDeErrar = 0;
 
-  //sons do jogo
-  let raquetada;
-  let ponto;
-  let trilha;
+    //placar do jogo
+    let meusPontos = 0;
+    let pontosOponente = 0;
 
-  //configurações do canvas
-  pincel.fillStyle = "black";
-  pincel.fillRect(0, 0, 600, 400);
+    //sons do jogo
+    let raquetada;
+    let ponto;
+    let trilha;
 
-  function desenhaBolinha(x, y, raio, cor) {
-    pincel.fillStyle = cor;
-    pincel.beginPath();
-    pincel.arc(x, y, raio, 0, 2 * Math.PI);
-    pincel.fill();
-  }
-
-  function desenhaRaquete(x, y) {
-    pincel.fillStyle = cor;
-    pincel.fillRect(x, y, larguraRaquete, alturaRaquete);
-  }
-
-  function desenhaRetangulo(x, y, largura, altura, cor) {
-    pincel.fillStyle = cor;
-    pincel.fillRect(x, y, largura, altura);
-    pincel.strokeStyle = "white";
-    pincel.strokeRect(x, y, largura, altura);
-  }
-
-  function limpaTela() {
-    pincel.clearRect(0, 0, 600, 400);
+    //configurações do canvas
     pincel.fillStyle = "black";
     pincel.fillRect(0, 0, 600, 400);
-  }
 
-  function draw() {
-    limpaTela();
-    desenhaBolinha(x, y, raio, cor);
-    movimentaBolinha();
-    verificaColisaoBorda();
-    desenhaRaquete(xRaquete, yRaquete);
-    desenhaRaquete(xRaqueteOponente, yRaqueteOponente);
-    movimentaMinhaRaquete();
-    verificaColisaoRaquete();
-    verificaColisaoRaqueteOponente();
-    movimentaRaqueteOponente();
-    incluiPlacar(130, 26, meusPontos, 110);
-    incluiPlacar(470, 26, pontosOponente, 450);
-    marcaPonto();
-    
-
-  }
-
-  function movimentaBolinha() {
-    x += velocidadeX;
-    y += velocidadeY;
-  }
-
-  function verificaColisaoBorda() {
-    if (x + raio > tela.width || x - raio < 0) {
-      velocidadeX *= -1;
+    function desenhaBolinha(x, y, raio, cor) {
+      pincel.fillStyle = cor;
+      pincel.beginPath();
+      pincel.arc(x, y, raio, 0, 2 * Math.PI);
+      pincel.fill();
     }
-    if (y + raio > tela.height || y - raio < 0) {
-      velocidadeY *= -1;
-    }
-  }
 
-  function verificaColisaoRaquete() {
-    if (
-      x - raio < xRaquete + larguraRaquete &&
-      y - raio < yRaquete + alturaRaquete &&
-      y + raio > yRaquete
-    ) {
-      velocidadeX *= -1;
-      playRaquetada();
+    function desenhaRaquete(x, y) {
+      pincel.fillStyle = cor;
+      pincel.fillRect(x, y, larguraRaquete, alturaRaquete);
     }
-  }
 
-  function verificaColisaoRaqueteOponente() {
-    if (
-      x + raio > xRaqueteOponente + larguraRaquete &&
-      y - raio < yRaqueteOponente + alturaRaquete &&
-      y + raio > yRaqueteOponente
-    ) {
-      velocidadeX *= -1;
-      playRaquetada();
+    function desenhaRetangulo(x, y, largura, altura, cor) {
+      pincel.fillStyle = cor;
+      pincel.fillRect(x, y, largura, altura);
+      pincel.strokeStyle = "white";
+      pincel.strokeRect(x, y, largura, altura);
     }
-  }
 
-  function movimentaMinhaRaquete() {
-    document.onkeydown = function (tecla) {
-      if (tecla.key == "ArrowUp" && event.type == "keydown") {
-        yRaquete -= 20;
-        if (yRaquete <= 0) {
-          yRaquete = 0;
-        }
+    function limpaTela() {
+      pincel.clearRect(0, 0, 600, 400);
+      pincel.fillStyle = "black";
+      pincel.fillRect(0, 0, 600, 400);
+    }
+
+    function draw() {
+
+      //Separar as chamadas em funções separadas para diminuir a resposabilidade >>>
+      limpaTela();
+      movimentaBolinha();
+      movimentaMinhaRaquete();
+      movimentaRaqueteOponente();
+      verificaColisaoBorda();
+      verificaColisaoRaqueteOponente();
+      verificaColisaoRaquete();
+      incluiPlacar(130, 26, meusPontos, 110);
+      incluiPlacar(470, 26, pontosOponente, 450);
+      desenhaBolinha(x, y, raio, cor);
+      desenhaRaquete(xRaquete, yRaquete);
+      desenhaRaquete(xRaqueteOponente, yRaqueteOponente);
+      marcaPonto();
+      //Separar as chamadas em funções separadas para diminuir a resposabilidade <<<
+    }
+
+    function movimentaBolinha() {
+      x += velocidadeX;
+      y += velocidadeY;
+    }
+
+    function verificaColisaoBorda() {
+      if (x + raio > tela.width || x - raio < 0) {
+        velocidadeX *= -1;
       }
-      if (tecla.key == "ArrowDown" && event.type == "keydown") {
-        yRaquete += 20;
-        if (yRaquete >= 310) {
-          yRaquete = 310;
-        }
+      if (y + raio > tela.height || y - raio < 0) {
+        velocidadeY *= -1;
       }
-    };
-  }
-
-  function movimentaRaqueteOponente() {
-    velocidadeYOponente = y - yRaqueteOponente - larguraRaquete / 2 - 30; //-50 é a margem de erro pra que possamos fazer pontos
-    yRaqueteOponente += velocidadeYOponente + chanceDeErrar;
-    calculaChanceDeErrar();
-    if (yRaqueteOponente <= 0) {
-      yRaqueteOponente = 0;
     }
-    if (yRaqueteOponente >= 310) {
-      yRaqueteOponente = 310;
+
+    function verificaColisaoRaquete() {
+      if (
+        x - raio < xRaquete + larguraRaquete &&
+        y - raio < yRaquete + alturaRaquete &&
+        y + raio > yRaquete
+      ) {
+        velocidadeX *= -1;
+        playRaquetada();
+      }
     }
-  }
 
-  function incluiPlacar(x, y, pontos, xFundo) {
-    desenhaRetangulo(xFundo, 10, 40, 20, "orange");
-
-    pincel.font = "16px Pixel";
-    pincel.fillStyle = "white";
-    pincel.textAlign = "center";
-    pincel.fillText(pontos, x, y);
-  }
-
-  function marcaPonto() {
-    if (x > 590) {
-      meusPontos += 1;
-      playPonto();
+    function verificaColisaoRaqueteOponente() {
+      if (
+        x + raio > xRaqueteOponente + larguraRaquete &&
+        y - raio < yRaqueteOponente + alturaRaquete &&
+        y + raio > yRaqueteOponente
+      ) {
+        velocidadeX *= -1;
+        playRaquetada();
+      }
     }
-    if (x < 10) {
-      pontosOponente += 1;
-      playPonto();
+
+    function movimentaMinhaRaquete() {
+      document.onkeydown = function (tecla) {
+        if (tecla.key == "ArrowUp") {
+          //Separar esse trecho em um função >>>
+          yRaquete -= 20;
+          if (yRaquete <= 0) {
+            yRaquete = 0;
+          }
+          //Separar esse trecho em um função <<<
+        }
+        if (tecla.key == "ArrowDown") {
+          //Separar esse trecho em um função >>>
+          yRaquete += 20;
+          if (yRaquete >= 310) {
+            yRaquete = 310;
+          }
+          //Separar esse trecho em um função <<<
+        }
+      };
     }
-  }
 
-  trilha = document.getElementById("trilha");
-  trilha.volume = 0.3;
-  raquetada = document.getElementById("raquetada");
-  ponto = document.getElementById("ponto");
+    function movimentaRaqueteOponente() {
+      velocidadeYOponente = y - yRaqueteOponente - larguraRaquete / 2 - 30; //-50 é a margem de erro pra que possamos fazer pontos
+      yRaqueteOponente += velocidadeYOponente + chanceDeErrar;
+      calculaChanceDeErrar();
+      if (yRaqueteOponente <= 0) {
+        yRaqueteOponente = 0;
+      }
+      if (yRaqueteOponente >= 310) {
+        yRaqueteOponente = 310;
+      }
+    }
 
-  function playRaquetada(){
-    raquetada.volume = 1.0;
-    raquetada.play();
-  }
+    function incluiPlacar(x, y, pontos, xFundo) {
+      desenhaRetangulo(xFundo, 10, 40, 20, "orange");
 
-  function playPonto(){
-    ponto.volume = 1.0;
-    ponto.play();
-  }
+      pincel.font = "16px Pixel";
+      pincel.fillStyle = "white";
+      pincel.textAlign = "center";
+      pincel.fillText(pontos, x, y);
+    }
+
+    function marcaPonto() {
+      if (x > 590) {
+        meusPontos += 1;
+        playPonto();
+      }
+      if (x < 10) {
+        pontosOponente += 1;
+        playPonto();
+      }
+    }
+
+    trilha = document.getElementById("trilha");
+    trilha.volume = 0.3;
+    raquetada = document.getElementById("raquetada");
+    ponto = document.getElementById("ponto");
+
+    function playRaquetada() {
+      raquetada.volume = 1.0;
+      raquetada.play();
+    }
+
+    function playPonto() {
+      ponto.volume = 1.0;
+      ponto.play();
+    }
 
     function calculaChanceDeErrar() {
-  if (pontosOponente >= meusPontos) {
-    chanceDeErrar += 1
-    if (chanceDeErrar >= 39){
-    chanceDeErrar = 40
+      if (pontosOponente >= meusPontos) {
+        chanceDeErrar += 1
+        if (chanceDeErrar >= 39) {
+          chanceDeErrar = 40
+        }
+      } else {
+        chanceDeErrar -= 1
+        if (chanceDeErrar <= 35) {
+          chanceDeErrar = 35
+        }
+      }
     }
-  } else {
-    chanceDeErrar -= 1
-    if (chanceDeErrar <= 35){
-    chanceDeErrar = 35
-    }
-  }
-}
-  setInterval(draw, 20);
-</script>
+    setInterval(draw, 20);
+  </script>
 
 </body>
+
 </html>
